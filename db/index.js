@@ -80,6 +80,11 @@ export default {
         });
       }
     }
+
+    // filter events that are older than yesterday
+    const yesterday = dayjs().add(-1, 'd').startOf('d');
+    events = events.filter(event => dayjs(event.date).unix() > yesterday.unix());
+
     return events;
   },
   getTags: async function () {
