@@ -1,6 +1,105 @@
+# Vorbereitung
+
+```
+node version > 16
+```
+
 # Einrichten
+
+Abhängigkeiten installieren
+
+```
+yarn
+```
+
+oder
+
+```
+npm i
+```
+
+# Umgebungsvariablen
+
 Eine `.env` Datei anlegen mit folgenden Werten:
+
+## PORT
+
+Der gewünschte Port für die API
+
+## BOT_TOKEN
+
+Der von Telegram bereitgestellte Bot Token
+
+## DB_PATH
+
+Ein absoluter Dateipfad auf eine JSON-Datei welche als Datenbank genutzt wird.  
+Beispiel: `C:\Users\Admin\Desktop\db.json`
+
+## IMPORT_DUMMY_ZBAU
+
+Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://z-bau.de/programm/` enthält.  
+Hiermit kann ein HTTP-Request beim Import umgangen werden.
+
+# Starten
+
+## API
+
 ```
-SERVER_PORT=<SERVER_PORT>
-BOT_TOKEN=<TELEGRAM_BOT_TOKEN>
+yarn dev-api
 ```
+
+oder
+
+```
+npm run dev-api
+```
+
+## Bot
+
+```
+yarn dev-bot
+```
+
+oder
+
+```
+npm run dev-bot
+```
+
+# Benutzen
+
+## API
+
+### POST `/import/zbau`
+
+Importiert die Events von der ZBau Webseite
+
+### GET `/events`
+
+Filtern der Events.
+
+#### Parameter `categories`
+
+Kommareparierte Liste von Kategorien
+
+#### Parameter `text`
+
+Textfilter
+
+#### Parameter `nextWeekend = 1`
+
+Filtert nach Veranstaltungen am kommenden Wochenende
+
+## Bot
+
+### `/import`
+
+Importiert die Events von der ZBau Webseite
+
+### `/categories`
+
+Gibt eine Auswahl der vorhandenen Kategorien
+
+### `/events [query]`
+
+Gibt nie nächsten Events oder Events mit Textfilter zurück
