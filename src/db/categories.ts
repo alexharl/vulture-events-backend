@@ -69,21 +69,29 @@ export function resolveCategories(tags: string[]) {
   for (let tag of tags) {
     const lower = tag.toLowerCase();
 
+    // Iterate through the list of categories.
     for (let category of categories) {
       let match = false;
+
+      // Check if the tag matches any of the category tags.
       if (category.tags && category.tags?.includes(lower)) {
         match = true;
       }
+
+      // Check if the tag matches the category regex.
       if (category.regex) {
         if (category.regex.test(lower)) {
           match = true;
         }
       }
+
+      // If the tag matches the category, add the category to the list of matches.
       if (match == true) {
         setCategories.add(category.id);
       }
     }
   }
 
+  // Return the list of categories.
   return [...setCategories];
 }

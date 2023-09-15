@@ -3,6 +3,9 @@ import { ActionResponse } from '../model/actionResponse.js';
 import { IImportResult } from '../model/importInfo.js';
 import { loadEvents } from '../scraper/zbau.js';
 
+/**
+ * Performs the import of events from ZBau
+ */
 export async function performImport() {
   console.log(`🔎 [ZBau] Import started`);
   const response = new ActionResponse<IImportResult>();
