@@ -20,17 +20,20 @@ const port = process.env.PORT;
 initDB(process.env.DB_PATH as string);
 
 app.post('/import/zbau', async (req: Request, res: Response) => {
+  console.log('🟢 [API] Importing ZBAU events');
   try {
     const importResponse = await performImport();
     res.send(importResponse);
   } catch (e: any) {
-    console.log('Import failed:', e.message);
+    console.log('⭕️ [API] Import failed:', e.message);
     res.status(500).send(ActionResponse.Error('Server error'));
   }
 });
 
 app.get('/events', async (req: Request, res: Response) => {
+  console.log('🟢 [API] Filter events');
   try {
+    // build filter query from request query
     const query: IEventQuery = {
       nextWeekend: req.query.nextWeekend === '1'
     };
@@ -48,11 +51,11 @@ app.get('/events', async (req: Request, res: Response) => {
     const filteredEventsResponse = await filterEvents(query);
     res.send(filteredEventsResponse);
   } catch (e: any) {
-    console.log('Filter events failed:', e.message);
+    console.log('⭕️ [API] Filter events failed:', e.message);
     res.status(500).send(ActionResponse.Error('Server error'));
   }
 });
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running on port: ${port}`);
+  console.log(`⚡️ [Server]: Server is running on port: ${port}`);
 });

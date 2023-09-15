@@ -11,3 +11,9 @@ export interface IEventQuery {
   nextWeekend?: boolean;
   limit?: number;
 }
+
+export interface IDBUpsertResult {
+  created: number;
+  updated: number;
+  deleted: number;
+}

@@ -5,20 +5,9 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import fs from 'fs';
 import dayjs from 'dayjs';
+import { resolveCategories } from '../db/categories.js';
 
 const tagBlacklist = ['präsentiert', 'tour', 'und', 'mit'];
-const categoryRules = {
-  dnb: { tags: ['dnb', 'drum and bass', 'drum & bass', "drum'n'bass", "drum 'n' bass", "drum n' bass", 'drum n bass', 'drumnbass', 'drumandbass'] },
-  hiphop: { regex: /rap/, tags: ['hiphop', 'hip hop', 'hip-hop'] },
-  punk: { regex: /punk/ },
-  rock: { regex: /rock|metal/ },
-  pop: { regex: /pop/ },
-  rap: { regex: /rap/ },
-  techno: { regex: /techno|house/, tags: ['downtempo'] },
-  psy: { tags: ['goa', 'psy', 'tek'] },
-  dub: { tags: ['reggae', 'dub', 'bass'] },
-  sonstiges: { tags: ['lesung', 'markt', 'podcast', 'bingo', 'flohmarkt'] }
-};
 
 /**
  * Load the website content
@@ -50,37 +39,6 @@ function resolveTags(text: string) {
   }
 
   return [...tags];
-}
-
-/**
- * Resolves a list of tags to categories
- * @param tags tags to check
- * @returns List of categories
- */
-function resolveCategories(tags: string[]) {
-  let categories = new Set<string>();
-
-  for (let tag of tags) {
-    const lower = tag.toLowerCase();
-
-    for (let category of Object.keys(categoryRules)) {
-      const rules = (categoryRules as any)[category] as { regex?: RegExp; tags?: string[] };
-      let match = false;
-      if (rules.tags && rules.tags?.includes(lower)) {
-        match = true;
-      }
-      if (rules.regex) {
-        if (rules.regex.test(lower)) {
-          match = true;
-        }
-      }
-      if (match == true) {
-        categories.add(category);
-      }
-    }
-  }
-
-  return [...categories];
 }
 
 function parseEvent(elem: cheerio.Element) {
@@ -146,7 +104,7 @@ function parseEvent(elem: cheerio.Element) {
 
     return event;
   } catch (e: any) {
-    console.log(`Error parsing event "${id}"`);
+    console.log(`❗️ [ZBau] Error parsing event "${id}"`);
     return null;
   }
 }

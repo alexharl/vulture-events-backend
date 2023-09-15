@@ -1,13 +1,13 @@
 {
-  "name": "event-backend",
+  "name": "vulture-events",
   "version": "1.0.0",
-  "main": "server.js",
-  "author": "Alexander Harl <alexander.harl@curry-group.com>",
+  "main": "api.js",
+  "author": "Alexander Harl <aharl.priv@gmail.com>",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "bot": "node bot.js",
+    "api": "node dist/api.js",
+    "bot": "node dist/bot.js",
     "build": "npx tsc",
     "dev-bot": "concurrently \"npx tsc --watch\" \"nodemon -q dist/bot.js\"",
     "dev-api": "concurrently \"npx tsc --watch\" \"nodemon -q dist/api.js\""

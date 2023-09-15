@@ -1,13 +1,10 @@
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 
 import dayjs from 'dayjs';
 
 import { IEvent } from '../model/event.js';
-import { DBSchema, IEventQuery } from '../model/db.js';
+import { DBSchema, IDBUpsertResult, IEventQuery } from '../model/db.js';
 import { ActionResponse } from '../model/actionResponse.js';
 
 let db: Low<DBSchema>;
@@ -21,17 +18,13 @@ export async function initialize(dbPath: string) {
     throw new Error('No DB path specified!');
   }
 
-  // db.json file path
-  const __dirname = dirname(fileURLToPath(import.meta.url));
-  const file = join(__dirname, dbPath);
-
   // Configure lowdb to write data to JSON file
-  const adapter = new JSONFile<DBSchema>(file);
+  const adapter = new JSONFile<DBSchema>(dbPath);
   const defaultData: DBSchema = { events: [] };
   db = new Low<DBSchema>(adapter, defaultData);
 
   await db.read();
-  console.log(`[DB] initialized with ${db.data.events.length} events`);
+  console.log(`💾 [DB]: initialized with ${db.data.events.length} events`);
 }
 
 /**
@@ -75,8 +68,8 @@ export async function upsertEvents(origin: string, events: IEvent[]) {
   // commit to db
   await db.write();
 
-  console.log(`[DB] ${origin} import completed with ${numEventsCreated} created, ${numEventsDeleted} deleted, ${numEventsUpdated} updated`);
-  return ActionResponse.Data({ created: numEventsCreated, updated: numEventsUpdated, deleted: numEventsDeleted });
+  console.log(`💾 [DB]: '${origin}' import completed with ${numEventsCreated} created, ${numEventsDeleted} deleted, ${numEventsUpdated} updated`);
+  return ActionResponse.Data<IDBUpsertResult>({ created: numEventsCreated, updated: numEventsUpdated, deleted: numEventsDeleted });
 }
 
 /**
@@ -97,8 +90,11 @@ export function filterEvents(query: IEventQuery) {
     if (query.origin && event.origin !== query.origin) return false;
 
     // match categories (only one)
-    if (query.categories?.length && event.categories?.length) {
-      return event.categories.some(cat => event.categories?.includes(cat));
+    if (query.categories?.length) {
+      if (!event.categories?.length) return false;
+
+      const match = event.categories.some(category => query.categories?.includes(category));
+      if (!match) return false;
     }
 
     // regex match text
@@ -112,7 +108,9 @@ export function filterEvents(query: IEventQuery) {
     }
 
     // filter for weekend
-    if (query.nextWeekend && event.dateUnix) {
+    if (query.nextWeekend) {
+      if (!event.dateUnix) return false;
+      
       const startOfWeekend = nextFriday.startOf('d').add(-1, 'h').unix();
       const endOfWeekend = nextSunday.endOf('d').add(1, 'h').unix();
       const isWeekend = event.dateUnix > startOfWeekend && event.dateUnix < endOfWeekend;
