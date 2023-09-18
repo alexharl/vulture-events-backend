@@ -10,7 +10,8 @@ import { resolveCategories } from '../db/categories.js';
 const tagBlacklist = ['präsentiert', 'tour', 'und', 'mit'];
 
 /**
- * Load the website content
+ * Returns the contents of the Z-Bau website as a string.
+ * will return the contents of the dummy file if the IMPORT_DUMMY_ZBAU environment variable is set.
  * @returns HTML string
  */
 async function getHtml() {
@@ -29,12 +30,16 @@ async function getHtml() {
  * @returns List of tags
  */
 function resolveTags(text: string) {
-  let tags = new Set<string>();
+  const tags = new Set<string>();
+  const potentialTags = text.split(/,|\+/).map(tag => tag.trim());
 
-  let potentialTags = text.split(/,|\+/).map(tag => tag.trim());
-  for (let tag of potentialTags) {
-    if (tag.length <= 2) continue;
-    if (tagBlacklist.includes(tag.toLowerCase())) continue;
+  for (const tag of potentialTags) {
+    if (tag.length <= 2) {
+      continue;
+    }
+    if (tagBlacklist.includes(tag.toLowerCase())) {
+      continue;
+    }
     tags.add(tag);
   }
 
@@ -109,6 +114,9 @@ function parseEvent(elem: cheerio.Element) {
   }
 }
 
+/**
+ * Parses the HTML of the event page and returns an array of events
+ */
 async function parseHtml(html: string) {
   const $ = cheerio.load(html);
   const events = [] as IEvent[];

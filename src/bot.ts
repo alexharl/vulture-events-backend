@@ -13,6 +13,8 @@ dayjs.locale('de');
 import { filterEvents, initialize as initDB } from './db/index.js';
 import { escapeMarkdownV2, eventsToFormattedMessage } from './bot/message.js';
 import { categories } from './db/categories.js';
+import { InlineKeyboardButton } from '@telegraf/types';
+import { ICategory } from './model/category.js';
 
 initDB(process.env.DB_PATH as string);
 
@@ -33,37 +35,48 @@ bot.command('import', async ctx => {
       messageText += '\n' + importResponse.data?.deleted + ' deleted';
       messageText += '\n' + importResponse.data?.created + ' created';
     } else {
-      messageText += '\nFAILED:' + importResponse.message;
+      messageText += '\nFehler:' + importResponse.message;
     }
-    ctx.telegram.editMessageText(ctx.chat.id, messageSent.message_id, undefined, messageText, { parse_mode: 'MarkdownV2' });
+    ctx.telegram.editMessageText(ctx.chat.id, messageSent.message_id, undefined, escapeMarkdownV2(messageText), { parse_mode: 'MarkdownV2' });
   } catch (e: any) {
     console.log('⭕️ [BOT] Import failed:', e.message);
-    messageText += '\nFAILED: Unknown error';
-    ctx.telegram.editMessageText(ctx.chat.id, messageSent.message_id, undefined, messageText, { parse_mode: 'MarkdownV2' });
+    messageText += '\nFehler: Unknown error';
+    ctx.telegram.editMessageText(ctx.chat.id, messageSent.message_id, undefined, escapeMarkdownV2(messageText), { parse_mode: 'MarkdownV2' });
   }
 });
 
 bot.command('weekend', async ctx => {
-  const events = await filterEvents({ nextWeekend: true });
+  // Filter events to find the ones that are happening this weekend
+  const events = filterEvents({ nextWeekend: true });
+
+  // Build the message to send to the user
   let message = '*Events am Wochenende*\n\n';
+
+  // Check if there was an error filtering the events
   if (!events.success) {
     message += 'Fehler beim Laden der Events';
   } else {
+    // If there were no errors, add the events to the message
     message += eventsToFormattedMessage(events.data || []);
   }
 
+  // Send the message to the user
   ctx.sendMessage(message, { parse_mode: 'MarkdownV2' });
 });
 
 bot.command('categories', async ctx => {
-  const chunkedCategories = [...Array(Math.ceil(categories.length / 2))].map(_ =>
-    categories.splice(0, 2).map(category => {
+  let chunked: ICategory[][] = [];
+  for (let i = 0; i < categories.length; i += 2) {
+    chunked.push(categories.slice(i, i + 2));
+  }
+  const chunkedCategories: InlineKeyboardButton[][] = chunked.map(group => {
+    return group.map(category => {
       return {
         text: category.name,
         callback_data: category.id
       };
-    })
-  );
+    });
+  });
 
   ctx.reply('Wähle eine der Kategorien', {
     reply_markup: {
@@ -88,8 +101,8 @@ bot.action(categoriesRegex, async ctx => {
   const category = categories.find(c => c.id === categoryId);
 
   if (category) {
-    const events = await filterEvents({ categories: [category.id] });
-    let message = `*${category.name}*\n\n`;
+    const events = filterEvents({ categories: [category.id] });
+    let message = `*${escapeMarkdownV2(category.name)}*\n\n`;
     if (!events.success) {
       message += 'Fehler beim Laden der Events';
     } else {
@@ -98,20 +111,20 @@ bot.action(categoriesRegex, async ctx => {
 
     ctx.sendMessage(message, { parse_mode: 'MarkdownV2' });
   } else {
-    ctx.sendMessage(`Unbekannte Kategorie '${categoryId}'`, { parse_mode: 'MarkdownV2' });
+    ctx.sendMessage(`Unbekannte Kategorie '${escapeMarkdownV2(categoryId)}'`, { parse_mode: 'MarkdownV2' });
   }
 });
 
 bot.command('events', async ctx => {
   const incomingMessage = ctx.message.text.replace('/events', '').trim();
 
-  const events = await filterEvents(incomingMessage.length ? { text: incomingMessage, limit: 5 } : {});
+  const events = filterEvents(incomingMessage.length ? { text: incomingMessage, limit: 5 } : {});
 
   let message = '';
   if (!incomingMessage.length) {
     message = `*Nächste Events*\n\n`;
   } else {
-    message = `*Events für \'${escapeMarkdownV2(incomingMessage)}\'*\n\n`;
+    message = `*Events für \'${incomingMessage}\'*\n\n`;
   }
 
   if (!events.success) {
