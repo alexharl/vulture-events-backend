@@ -48,7 +48,7 @@ app.get('/events', async (req: Request, res: Response) => {
       query.origin = req.query.origin;
     }
 
-    const filteredEventsResponse = await filterEvents(query);
+    const filteredEventsResponse = filterEvents(query);
     res.send(filteredEventsResponse);
   } catch (e: any) {
     console.log('⭕️ [API] Filter events failed:', e.message);

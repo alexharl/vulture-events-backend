@@ -45,13 +45,15 @@ function eventToFormattedMessage(event: IEvent) {
 
 /**
  * Formats a list of events to a markdown message
- * @param events 
- * @returns 
+ * @param events
+ * @returns
  */
 export function eventsToFormattedMessage(events: IEvent[]) {
+  const NO_EVENTS_FOUND = 'Keine Events gefunden';
+
   let message = '';
   if (!events.length) {
-    message += 'Keine Events gefunden';
+    message += NO_EVENTS_FOUND;
   } else {
     events.forEach(event => {
       message += eventToFormattedMessage(event);
