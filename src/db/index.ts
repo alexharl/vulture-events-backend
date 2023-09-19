@@ -73,6 +73,19 @@ export async function upsertEvents(origin: string, events: IEvent[]) {
 }
 
 /**
+ * Get event by id
+ * @param id - Event id
+ * @returns ActionResult with event
+ */
+export async function getEventById(id: string) {
+  const event = db.data.events.find(event => event.id === id);
+  if (!event) {
+    return ActionResponse.Error('Event not found');
+  }
+  return ActionResponse.Data(event);
+}
+
+/**
  * Filter events
  * @param query - Query object
  * @returns ActionResult with events array

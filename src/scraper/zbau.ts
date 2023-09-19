@@ -55,7 +55,7 @@ function parseEvent(elem: cheerio.Element) {
 
     const event: IEvent = {
       origin: 'zbau',
-      id,
+      id: id.split('/').join('-'),
       dateUnix: 0
     };
 
