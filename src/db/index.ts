@@ -110,7 +110,7 @@ export function filterEvents(query: IEventQuery) {
     // filter for weekend
     if (query.nextWeekend) {
       if (!event.dateUnix) return false;
-      
+
       const startOfWeekend = nextFriday.startOf('d').add(-1, 'h').unix();
       const endOfWeekend = nextSunday.endOf('d').add(1, 'h').unix();
       const isWeekend = event.dateUnix > startOfWeekend && event.dateUnix < endOfWeekend;
@@ -120,7 +120,11 @@ export function filterEvents(query: IEventQuery) {
     return true;
   });
 
-  filteredEvents = filteredEvents.slice(0, query.limit || 10).sort((a, b) => a.dateUnix - b.dateUnix);
+  // limit
+  filteredEvents = filteredEvents.slice(0, query.limit || 10);
+
+  // sort
+  filteredEvents = filteredEvents.sort((a, b) => a.dateUnix - b.dateUnix);
 
   return ActionResponse.Data(filteredEvents);
 }
