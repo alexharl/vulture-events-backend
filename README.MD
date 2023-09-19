@@ -6,7 +6,7 @@ node version > 16
 
 # Einrichten
 
-Abhängigkeiten installieren
+## Abhängigkeiten installieren
 
 ```
 yarn
@@ -17,6 +17,10 @@ oder
 ```
 npm i
 ```
+
+## Telegram Bot erstellen
+Am einfachsten einen Chat mit dem [BotFather](https://t.me/botfather) eröffnen und mit dem Kommando `/newbot` einen Bot erstellen.  
+Den Anweisungen folgen und den erstellten Token speichern.
 
 # Umgebungsvariablen
 
@@ -80,7 +84,7 @@ Filtern der Events.
 
 #### Parameter `categories`
 
-Kommareparierte Liste von Kategorien
+Kommaseparierte Liste von Kategorien
 
 #### Parameter `text`
 
@@ -100,6 +104,10 @@ Importiert die Events von der ZBau Webseite
 
 Gibt eine Auswahl der vorhandenen Kategorien
 
+### `/weekend`
+
+Gibt die Veranstaltungen am kommenden (aktuellen) Wochenende aus
+
 ### `/events [query]`
 
-Gibt nie nächsten Events oder Events mit Textfilter zurück
+Gibt die nächsten Events oder Events mit Textfilter zurück
