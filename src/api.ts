@@ -10,6 +10,7 @@ dayjs.extend(customParseFormat);
 import { ActionResponse } from './model/actionResponse.js';
 import { performImport as importZbau } from './import/zbau.js';
 import { performImport as importRakete } from './import/rakete.js';
+import { performImport as importHaus33 } from './import/haus33.js';
 
 import { initialize as initDB, filterEvents, getEventById } from './db/index.js';
 import { IEventQuery } from './model/db.js';
@@ -44,12 +45,24 @@ app.post('/api/import/rakete', async (req: Request, res: Response) => {
   }
 });
 
+app.post('/api/import/haus33', async (req: Request, res: Response) => {
+  console.log('🟢 [API] Importing Haus33 events');
+  try {
+    const importResponse = await importHaus33();
+    res.send(importResponse);
+  } catch (e: any) {
+    console.log('⭕️ [API] Import failed:', e.message);
+    res.status(500).send(ActionResponse.Error('Server error'));
+  }
+});
+
 app.post('/api/import', async (req: Request, res: Response) => {
   console.log('🟢 [API] Importing all origins');
   try {
     const importZbauResponse = await importZbau();
     const importRaketeResponse = await importRakete();
-    res.send(ActionResponse.Data({ zbau: importZbauResponse, rakete: importRaketeResponse }));
+    const importHaus33Response = await importHaus33();
+    res.send(ActionResponse.Data({ zbau: importZbauResponse, rakete: importRaketeResponse, haus33: importHaus33Response }));
   } catch (e: any) {
     console.log('⭕️ [API] Import failed:', e.message);
     res.status(500).send(ActionResponse.Error('Server error'));

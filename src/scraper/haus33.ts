@@ -5,44 +5,20 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import fs from 'fs';
 import dayjs from 'dayjs';
-import { resolveCategories } from '../db/categories.js';
 
-const tagBlacklist = ['präsentiert', 'tour', 'und', 'mit'];
 /**
- * Returns the contents of the Rakete Ticket website as a string.
- * will return the contents of the dummy file if the IMPORT_DUMMY_RAKETE environment variable is set.
+ * Returns the contents of the Haus33 Ticket website as a string.
+ * will return the contents of the dummy file if the IMPORT_DUMMY_HAUS33 environment variable is set.
  * @returns HTML string
  */
 async function getHtml() {
-  const dummyFilepath = process.env.IMPORT_DUMMY_RAKETE;
+  const dummyFilepath = process.env.IMPORT_DUMMY_HAUS33;
   if (dummyFilepath) {
     return fs.readFileSync(dummyFilepath, 'utf-8');
   } else {
-    const webResponse = await axios.get('https://dieraketenbg.ticket.io/');
+    const webResponse = await axios.get('https://haus33.ticket.io/');
     return webResponse.data;
   }
-}
-
-/**
- * Resolves text to a list of tags
- * @param text - text to resolve
- * @returns List of tags
- */
-function resolveTags(text: string) {
-  const tags = new Set<string>();
-  const potentialTags = text.split(/,|\+/).map(tag => tag.trim());
-
-  for (const tag of potentialTags) {
-    if (tag.length <= 2) {
-      continue;
-    }
-    if (tagBlacklist.includes(tag.toLowerCase())) {
-      continue;
-    }
-    tags.add(tag);
-  }
-
-  return [...tags];
 }
 
 function parseEvent(elem: cheerio.Element) {
@@ -53,7 +29,7 @@ function parseEvent(elem: cheerio.Element) {
     if (!id) return null;
 
     const event: IEvent = {
-      origin: 'rakete',
+      origin: 'haus33',
       id: id.replace('event-row-', ''),
       dateUnix: 0
     };
@@ -74,7 +50,7 @@ function parseEvent(elem: cheerio.Element) {
     }
 
     // Ticket
-    event.ticketLink = `https://dieraketenbg.ticket.io/${id}`;
+    event.ticketLink = `https://haus33.ticket.io/${id}`;
     event.price = $('i.material-symbols-rounded:contains("confirmation_number")').next('span').text();
 
     let imageUrl = $('img').attr('src');
@@ -87,11 +63,13 @@ function parseEvent(elem: cheerio.Element) {
 
     // Location
     const locationString = $('i.material-symbols-rounded:contains("location_on")').next('span').text();
-    event.locations = [locationString || 'Rakete'];
+    event.locations = [locationString || 'Haus33'];
+
+    console.log(`🏠 [Haus33] Parsed event "${id}"`);
 
     return event;
   } catch (e: any) {
-    console.log(`❗️ [Rakete] Error parsing event "${id}"`);
+    console.log(`❗️ [Haus33] Error parsing event "${id}"`);
     return null;
   }
 }

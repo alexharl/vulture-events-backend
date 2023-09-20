@@ -50,6 +50,11 @@ Hiermit kann ein HTTP-Request beim Import umgangen werden.
 Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://dieraketenbg.ticket.io/` enthält.  
 Hiermit kann ein HTTP-Request beim Import umgangen werden.
 
+## IMPORT_DUMMY_HAUS33
+
+Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://haus33.ticket.io/` enthält.  
+Hiermit kann ein HTTP-Request beim Import umgangen werden.
+
 ## CORS_ORIGIN
 
 Die für CORS hinterlegte Adresse
