@@ -3,5 +3,10 @@ node_modules
 db/*.json
 scraper/*.html
 .vscode
-dist
+/dist
 dummy
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.html

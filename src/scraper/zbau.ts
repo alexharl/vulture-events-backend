@@ -55,7 +55,7 @@ function parseEvent(elem: cheerio.Element) {
 
     const event: IEvent = {
       origin: 'zbau',
-      id,
+      id: id.split('/').join('-'),
       dateUnix: 0
     };
 
@@ -105,6 +105,11 @@ function parseEvent(elem: cheerio.Element) {
 
     // Tags & Categories
     event.tags = resolveTags(event.subtitle);
+
+    if (event.title.toLowerCase().includes('dot bass')) {
+      event.tags.push('drum and bass');
+    }
+
     event.categories = resolveCategories(event.tags);
 
     return event;
