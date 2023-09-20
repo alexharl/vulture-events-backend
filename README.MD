@@ -19,6 +19,7 @@ npm i
 ```
 
 ## Telegram Bot erstellen
+
 Am einfachsten einen Chat mit dem [BotFather](https://t.me/botfather) eröffnen und mit dem Kommando `/newbot` einen Bot erstellen.  
 Den Anweisungen folgen und den erstellten Token speichern.
 
@@ -43,6 +44,10 @@ Beispiel: `C:\Users\Admin\Desktop\db.json`
 
 Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://z-bau.de/programm/` enthält.  
 Hiermit kann ein HTTP-Request beim Import umgangen werden.
+
+## CORS_ORIGIN
+
+Die für CORS hinterlegte Adresse
 
 # Starten
 

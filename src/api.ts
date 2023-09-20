@@ -16,7 +16,7 @@ import { IEventQuery } from './model/db.js';
 dotenv.config();
 
 const app: Express = express();
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN }));
 const port = process.env.PORT;
 
 initDB(process.env.DB_PATH as string);
