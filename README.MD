@@ -45,6 +45,11 @@ Beispiel: `C:\Users\Admin\Desktop\db.json`
 Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://z-bau.de/programm/` enthält.  
 Hiermit kann ein HTTP-Request beim Import umgangen werden.
 
+## IMPORT_DUMMY_RAKETE
+
+Ein Optionaler Dateipfad zu einer Datei welche den Seitenquelltext von `https://dieraketenbg.ticket.io/` enthält.  
+Hiermit kann ein HTTP-Request beim Import umgangen werden.
+
 ## CORS_ORIGIN
 
 Die für CORS hinterlegte Adresse
