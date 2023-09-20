@@ -8,7 +8,8 @@ import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 dayjs.extend(customParseFormat);
 
 import { ActionResponse } from './model/actionResponse.js';
-import { performImport } from './import/zbau.js';
+import { performImport as importZbau } from './import/zbau.js';
+import { performImport as importRakete } from './import/rakete.js';
 
 import { initialize as initDB, filterEvents, getEventById } from './db/index.js';
 import { IEventQuery } from './model/db.js';
@@ -24,8 +25,31 @@ initDB(process.env.DB_PATH as string);
 app.post('/api/import/zbau', async (req: Request, res: Response) => {
   console.log('🟢 [API] Importing ZBAU events');
   try {
-    const importResponse = await performImport();
+    const importResponse = await importZbau();
     res.send(importResponse);
+  } catch (e: any) {
+    console.log('⭕️ [API] Import failed:', e.message);
+    res.status(500).send(ActionResponse.Error('Server error'));
+  }
+});
+
+app.post('/api/import/rakete', async (req: Request, res: Response) => {
+  console.log('🟢 [API] Importing Rakete events');
+  try {
+    const importResponse = await importRakete();
+    res.send(importResponse);
+  } catch (e: any) {
+    console.log('⭕️ [API] Import failed:', e.message);
+    res.status(500).send(ActionResponse.Error('Server error'));
+  }
+});
+
+app.post('/api/import', async (req: Request, res: Response) => {
+  console.log('🟢 [API] Importing all origins');
+  try {
+    const importZbauResponse = await importZbau();
+    const importRaketeResponse = await importRakete();
+    res.send(ActionResponse.Data({ zbau: importZbauResponse, rakete: importRaketeResponse }));
   } catch (e: any) {
     console.log('⭕️ [API] Import failed:', e.message);
     res.status(500).send(ActionResponse.Error('Server error'));
@@ -63,6 +87,9 @@ app.get('/api/events', async (req: Request, res: Response) => {
     }
     if (req.query.origin?.length && typeof req.query.origin === 'string') {
       query.origin = req.query.origin;
+    }
+    if (req.query.limit?.length && typeof req.query.limit === 'string') {
+      query.limit = parseInt(req.query.limit);
     }
 
     const filteredEventsResponse = filterEvents(query);
