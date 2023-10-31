@@ -74,7 +74,7 @@ function parseEvent(elem: cheerio.Element) {
     }
 
     // Ticket
-    event.ticketLink = `https://dieraketenbg.ticket.io/${id}`;
+    event.ticketLink = `https://dieraketenbg.ticket.io/${event.id}`;
     event.price = $('i.material-symbols-rounded:contains("confirmation_number")').next('span').text();
 
     let imageUrl = $('img').attr('src');
