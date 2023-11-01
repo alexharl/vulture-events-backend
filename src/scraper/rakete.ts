@@ -66,7 +66,7 @@ function parseEvent(elem: cheerio.Element) {
     event.ageLimit = '18+';
 
     const dateString = $('i.material-symbols-rounded:contains("calendar_month")').next('span').text().split(' ')[1];
-    event.date = dateString;
+    event.date = dateString.split('/').join('.');
     const startTime = $('i.material-symbols-rounded:contains("schedule")').next('span').text().replace(' Uhr', '');
     if (startTime) {
       event.time = startTime;

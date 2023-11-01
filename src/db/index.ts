@@ -137,11 +137,11 @@ export function filterEvents(query: IEventQuery) {
     return true;
   });
 
-  // limit
-  filteredEvents = filteredEvents.slice(0, query.limit || 10);
-
   // sort
   filteredEvents = filteredEvents.sort((a, b) => a.dateUnix - b.dateUnix);
+
+  // limit
+  filteredEvents = filteredEvents.slice(0, query.limit || 10);
 
   return ActionResponse.Data(filteredEvents);
 }
