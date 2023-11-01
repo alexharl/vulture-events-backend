@@ -22,15 +22,17 @@ async function getHtml() {
 }
 
 function parseEvent(elem: cheerio.Element) {
-  let id: string | undefined = '';
+  let idValue: string | undefined = '';
   try {
     const $ = cheerio.load(elem);
-    id = $(elem).attr('id');
-    if (!id) return null;
+    idValue = $(elem).attr('id');
+    if (!idValue) return null;
+
+    const id = idValue.replace('event-row-', '');
 
     const event: IEvent = {
       origin: 'haus33',
-      id: id.replace('event-row-', ''),
+      id,
       dateUnix: 0
     };
 
@@ -65,11 +67,11 @@ function parseEvent(elem: cheerio.Element) {
     const locationString = $('i.material-symbols-rounded:contains("location_on")').next('span').text();
     event.locations = [locationString || 'Haus33'];
 
-    console.log(`🏠 [Haus33] Parsed event "${id}"`);
+    console.log(`🏠 [Haus33] Parsed event "${event.id}"`);
 
     return event;
   } catch (e: any) {
-    console.log(`❗️ [Haus33] Error parsing event "${id}"`);
+    console.log(`❗️ [Haus33] Error parsing event "${idValue}"`);
     return null;
   }
 }

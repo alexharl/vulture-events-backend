@@ -46,15 +46,17 @@ function resolveTags(text: string) {
 }
 
 function parseEvent(elem: cheerio.Element) {
-  let id: string | undefined = '';
+  let idValue: string | undefined = '';
   try {
     const $ = cheerio.load(elem);
-    id = $(elem).attr('id');
-    if (!id) return null;
+    idValue = $(elem).attr('id');
+    if (!idValue) return null;
+
+    const id = idValue.replace('event-row-', '');
 
     const event: IEvent = {
       origin: 'rakete',
-      id: id.replace('event-row-', ''),
+      id,
       dateUnix: 0
     };
 
@@ -74,7 +76,7 @@ function parseEvent(elem: cheerio.Element) {
     }
 
     // Ticket
-    event.ticketLink = `https://dieraketenbg.ticket.io/${event.id}`;
+    event.ticketLink = `https://dieraketenbg.ticket.io/${id}`;
     event.price = $('i.material-symbols-rounded:contains("confirmation_number")').next('span').text();
 
     let imageUrl = $('img').attr('src');
@@ -91,7 +93,7 @@ function parseEvent(elem: cheerio.Element) {
 
     return event;
   } catch (e: any) {
-    console.log(`❗️ [Rakete] Error parsing event "${id}"`);
+    console.log(`❗️ [Rakete] Error parsing event "${idValue}"`);
     return null;
   }
 }

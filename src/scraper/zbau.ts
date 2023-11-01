@@ -46,7 +46,7 @@ function resolveTags(text: string) {
   return [...tags];
 }
 
-function parseEvent(elem: cheerio.Element) {
+function parseEvent(elem: cheerio.Element, year: string) {
   let id: string | undefined = '';
   try {
     const $ = cheerio.load(elem);
@@ -68,7 +68,7 @@ function parseEvent(elem: cheerio.Element) {
 
     // Datum
     const dayString = $(elem).find('.event__day').text().trim();
-    const dateString = dayString.split('\n')[1].trim() + new Date().getFullYear();
+    const dateString = dayString.split('\n')[1].trim() + year;
     event.date = dateString;
     event.entryTime = $(elem).find('.event__einlass').text().trim();
     const startTime = $(elem).find('.event__beginn').text().trim();
@@ -126,9 +126,14 @@ async function parseHtml(html: string) {
   const $ = cheerio.load(html);
   const events = [] as IEvent[];
 
-  $('article').each((i, elem) => {
-    const parsedEvent = parseEvent(elem);
-    if (parsedEvent) events.push(parsedEvent);
+  $('.programm__year').each((i, yearElem) => {
+    const year = $(yearElem).attr('data-id')?.split('-')[1] || '2023';
+    $(yearElem)
+      .find('article')
+      .each((j, articleElem) => {
+        const parsedEvent = parseEvent(articleElem, year);
+        if (parsedEvent) events.push(parsedEvent);
+      });
   });
 
   return events;
