@@ -22,6 +22,7 @@ export async function performImport() {
   }
 
   // insert events into db
+  console.log(`🔎 [ZBau] Resolved ${scrapeResponse.data.length} events`);
   const dbResponse = await upsertEvents('zbau', scrapeResponse.data);
   if (!dbResponse.success || !dbResponse.data) {
     console.log(`🔎 [ZBau] Import failed:`, dbResponse.message || 'Unknown');

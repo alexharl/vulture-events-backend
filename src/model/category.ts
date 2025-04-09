@@ -1,6 +1,5 @@
 export interface ICategory {
   id: string;
   name: string;
-  tags: string[];
-  regex?: RegExp;
+  tags: RegExp[];
 }

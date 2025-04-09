@@ -115,8 +115,9 @@ async function parseEvent(eventData: AlgoliaHit): Promise<IEvent | null> {
     event.entryTime = eventData.entry_time;
     if (eventData.start_timestamp) {
       event.dateUnix = parseInt(eventData.start_timestamp);
-    } else {
-      const date = dayjs(eventData.date_title, 'ddd, DD.MM');
+    }
+    if (!event.dateUnix) {
+      const date = dayjs(eventData.date_title, 'ddd. DD.MM.');
       if (date.isValid()) {
         event.dateUnix = date.unix() * 1000;
       }
@@ -136,6 +137,10 @@ async function parseEvent(eventData: AlgoliaHit): Promise<IEvent | null> {
 
     event.categories = resolveCategories(event.tags);
 
+    if (event.title?.toLocaleLowerCase().includes('vultures') && event.categories.includes('dnb')) {
+      event.categories.push('featured');
+    }
+
     // load event details
     const eventDetailResponse = await getEventDetailResponse(eventData.slug);
 
@@ -144,7 +149,7 @@ async function parseEvent(eventData: AlgoliaHit): Promise<IEvent | null> {
 
       const descriptionElement = $('.event__description');
       const descriptionText = descriptionElement.html() || '';
-      
+
       if (descriptionText) {
         event.info = descriptionText;
       }
@@ -190,8 +195,8 @@ export async function loadEvents() {
 
   // parse content and convert to event objects
   const parsedEvents = [] as IEvent[];
-
-  for (let eventData of response.results[0].hits.slice(0, 4)) {
+  console.log(`🔎 [ZBau] loaded ${response.results[0].hits.length} events`);
+  for (let eventData of response.results[0].hits) {
     // parse event data
     const event = await parseEvent(eventData);
     if (event) {

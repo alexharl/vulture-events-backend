@@ -1,117 +1,19 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
-import dayjs from 'dayjs';
-dayjs.locale('de');
-import customParseFormat from 'dayjs/plugin/customParseFormat.js';
-dayjs.extend(customParseFormat);
-
-import { ActionResponse } from './model/actionResponse.js';
-import { performImport as importZbau } from './import/zbau.js';
-import { performImport as importRakete } from './import/rakete.js';
-import { performImport as importHaus33 } from './import/haus33.js';
-
-import { initialize as initDB, filterEvents, getEventById } from './db/index.js';
-import { IEventQuery } from './model/db.js';
+import importRouter from './router/import.js';
+import eventsRouter from './router/events.js';
+import { initialize as initDB } from './db/index.js';
 
 dotenv.config();
+initDB(process.env.DB_PATH as string);
 
 const app: Express = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN }));
 const port = process.env.PORT;
 
-initDB(process.env.DB_PATH as string);
-
-app.post('/api/import/zbau', async (req: Request, res: Response) => {
-  console.log('🟢 [API] Importing ZBAU events');
-  try {
-    const importResponse = await importZbau();
-    res.send(importResponse);
-  } catch (e: any) {
-    console.log('⭕️ [API] Import failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
-
-app.post('/api/import/rakete', async (req: Request, res: Response) => {
-  console.log('🟢 [API] Importing Rakete events');
-  try {
-    const importResponse = await importRakete();
-    res.send(importResponse);
-  } catch (e: any) {
-    console.log('⭕️ [API] Import failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
-
-app.post('/api/import/haus33', async (req: Request, res: Response) => {
-  console.log('🟢 [API] Importing Haus33 events');
-  try {
-    const importResponse = await importHaus33();
-    res.send(importResponse);
-  } catch (e: any) {
-    console.log('⭕️ [API] Import failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
-
-app.post('/api/import', async (req: Request, res: Response) => {
-  console.log('🟢 [API] Importing all origins');
-  try {
-    const importZbauResponse = await importZbau();
-    const importRaketeResponse = await importRakete();
-    const importHaus33Response = await importHaus33();
-    res.send(ActionResponse.Data({ zbau: importZbauResponse, rakete: importRaketeResponse, haus33: importHaus33Response }));
-  } catch (e: any) {
-    console.log('⭕️ [API] Import failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
-
-app.get('/api/events/:id', async (req: Request, res: Response) => {
-  console.log(`🟢 [API] Get event by id '${req.params.id}'`);
-  try {
-    const event = await getEventById(req.params.id);
-    if (!event) {
-      res.status(404).send(ActionResponse.Error('Event not found'));
-    } else {
-      res.send(event);
-    }
-  } catch (e: any) {
-    console.log('⭕️ [API] Get event by id failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
-
-app.get('/api/events', async (req: Request, res: Response) => {
-  console.log('🟢 [API] Filter events');
-  try {
-    // build filter query from request query
-    const query: IEventQuery = {
-      nextWeekend: req.query.nextWeekend === '1'
-    };
-
-    if (req.query.categories?.length && typeof req.query.categories === 'string') {
-      query.categories = req.query.categories.split(',');
-    }
-    if (req.query.text?.length && typeof req.query.text === 'string') {
-      query.text = req.query.text;
-    }
-    if (req.query.origin?.length && typeof req.query.origin === 'string') {
-      query.origin = req.query.origin;
-    }
-    if (req.query.limit?.length && typeof req.query.limit === 'string') {
-      query.limit = parseInt(req.query.limit);
-    }
-
-    const filteredEventsResponse = filterEvents(query);
-    res.send(filteredEventsResponse);
-  } catch (e: any) {
-    console.log('⭕️ [API] Filter events failed:', e.message);
-    res.status(500).send(ActionResponse.Error('Server error'));
-  }
-});
+app.use('/api/import', importRouter);
+app.use('/api/events', eventsRouter);
 
 app.listen(port, () => {
   console.log(`⚡️ [Server]: Server is running on port: ${port}`);

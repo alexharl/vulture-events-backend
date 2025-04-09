@@ -4,57 +4,52 @@ export const categories: ICategory[] = [
   {
     id: 'dnb',
     name: 'Drum & Bass',
-    tags: ['dnb', 'drum and bass', 'drum & bass', "drum'n'bass", "drum 'n' bass", "drum n' bass", 'drum n bass', 'drumnbass', 'drumandbass']
+    tags: [/dnb/, /drum\s*(&|and|n'?|'?n'?|\s*)\s*bass/]
   },
   {
     id: 'hiphop',
     name: 'Hip-Hop',
-    tags: ['hiphop', 'hip hop', 'hip-hop']
+    tags: [/hiphop/, /hip hop/, /hip-hop/]
   },
   {
     id: 'punk',
     name: 'Punk',
-    tags: [],
-    regex: /punk/
+    tags: [/punk/]
   },
   {
     id: 'rock',
     name: 'Rock',
-    tags: [],
-    regex: /rock|metal/
+    tags: [/rock/, /metal/]
   },
   {
     id: 'pop',
     name: 'Pop',
-    tags: [],
-    regex: /pop/
+    tags: [/pop/]
   },
   {
     id: 'rap',
     name: 'Rap',
-    tags: [],
-    regex: /rap/
+    tags: [/rap/]
   },
   {
     id: 'techno',
     name: 'Techno',
-    tags: ['downtempo'],
-    regex: /techno|house/
+    tags: [/downtempo/, /techno/, /house/]
   },
   {
     id: 'psy',
     name: 'Psy / Goa',
-    tags: ['goa', 'psy', 'tek']
+    tags: [/goa/, /psy/, /tek/]
   },
   {
     id: 'dub',
     name: 'Dub / Reggae',
-    tags: ['reggae', 'dub', 'bass']
+    tags: [/reggae/, /dub/]
   },
   {
     id: 'sonstiges',
     name: 'Sonstiges',
-    tags: ['lesung', 'markt', 'podcast', 'bingo', 'flohmarkt']
+    tags: [/lesung/, /markt/, /podcast/, /bingo/, /flohmarkt/]
   }
 ];
 
@@ -74,20 +69,17 @@ export function resolveCategories(tags: string[]) {
       let match = false;
 
       // Check if the tag matches any of the category tags.
-      if (category.tags && category.tags?.includes(lower)) {
-        match = true;
-      }
-
-      // Check if the tag matches the category regex.
-      if (category.regex) {
-        if (category.regex.test(lower)) {
-          match = true;
+      if (category.tags) {
+        for (let categoryTag of category.tags) {
+          if (categoryTag.test(lower)) {
+            match = true;
+            break;
+          }
         }
-      }
-
-      // If the tag matches the category, add the category to the list of matches.
-      if (match == true) {
-        setCategories.add(category.id);
+        // If the tag matches the category, add the category to the list of matches.
+        if (match == true) {
+          setCategories.add(category.id);
+        }
       }
     }
   }

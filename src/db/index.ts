@@ -93,7 +93,7 @@ export async function getEventById(id: string) {
 export function filterEvents(query: IEventQuery) {
   // for weekend filter
   const now = dayjs();
-  
+
   const startOfDay = now.startOf('d');
   const filterEventsBefore = (now.hour() < 6 ? startOfDay.subtract(4, 'h') : startOfDay).unix();
 
