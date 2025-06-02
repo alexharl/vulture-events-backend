@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getEventById, filterEvents } from '../db/index.js';
+import { getEventById, filterEvents, getEventsByIds } from '../db/index.js';
 import { IEventQuery } from '../model/db.js';
 import { ActionResponse } from '../model/actionResponse.js';
 
@@ -23,6 +23,16 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.get('/', async (req: Request, res: Response) => {
   console.log('🟢 [API] Filter events');
   try {
+    // by ids (for favorites)
+    if (req.query.ids?.length && typeof req.query.ids === 'string') {
+      const ids = req.query.ids.split(',');
+      if (ids.length > 100) {
+        return res.status(400).send(ActionResponse.Error('Too many ids, max 100 allowed'));
+      }
+      const eventsResponse = await getEventsByIds(ids);
+      return res.send(eventsResponse);
+    }
+
     const query: IEventQuery = {
       nextWeekend: req.query.nextWeekend === '1'
     };

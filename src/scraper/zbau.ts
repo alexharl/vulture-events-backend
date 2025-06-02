@@ -141,6 +141,18 @@ async function parseEvent(eventData: AlgoliaHit): Promise<IEvent | null> {
       event.categories.push('featured');
     }
 
+    if (event.title?.toLocaleLowerCase().includes('monsters of jungle') && event.categories.includes('dnb')) {
+      event.categories.push('featured');
+    }
+
+    if (event.title?.toLocaleLowerCase().includes('tsunami sound system') && event.categories.includes('dnb')) {
+      event.categories.push('featured');
+    }
+
+    if (event.title?.toLocaleLowerCase().includes('dubworx') && event.categories.includes('dnb')) {
+      event.categories.push('featured');
+    }
+
     // load event details
     const eventDetailResponse = await getEventDetailResponse(eventData.slug);
 

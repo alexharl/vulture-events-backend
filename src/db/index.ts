@@ -86,6 +86,23 @@ export async function getEventById(id: string) {
 }
 
 /**
+ * Get events by ids
+ * @param ids - List of event ids
+ * @returns ActionResult with events array
+ */
+export async function getEventsByIds(ids: string[]) {
+  let events = db.data.events.filter(event => ids.includes(event.id));
+  if (!events || events.length === 0) {
+    return ActionResponse.Error('No events found');
+  }
+
+  // sort
+  events = events.sort((a, b) => a.dateUnix - b.dateUnix);
+
+  return ActionResponse.Data(events);
+}
+
+/**
  * Filter events
  * @param query - Query object
  * @returns ActionResult with events array
